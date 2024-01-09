@@ -123,6 +123,7 @@
 
     <script>
         // 오픈API 연결하기
+        // url 및 코드 가져오기
         const options = {
             method: 'GET',
             headers: {
@@ -130,27 +131,31 @@
                 Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxY2M0YjMyNGMxY2I1MTE1NjYwMmU3ZTFiZDZjYjNiNiIsInN1YiI6IjY1OTdjMmYyZDdhNzBhMTIyZTZhNzU4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.c9oJQYV9BhCLydAjtopO7Jppjn4QmSJ3Jys9V2o8ufQ'
             }
         };
-        // url
 
         const url = 'https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1';
+
         let movieData
 
-        function movieList() {
+        // 함수 사용해서 데이터 가져오기(fetch / .then / getElementById)
+        function movieResult() {
             fetch(url, options)
                 .then(response => response.json())
                 .then(response => {
-                    movieData = response.results
-                    console.log(movieData);
+                    console.log(response)
+                    movieData = response.results;
+
+                    const cardList = document.getElementById('mycards');
                     for (let i = 0; i < movieData.length; i++) {
-                        const cardList = document.getElementById('mycards')
-                        let title = movieData[i]['title'];
-                        let poster_path = movieData[i]['poster_path'];
-                        let overview = movieData[i]['overview'];
-                        let vote_average = movieData[i]['vote_average'];
-                        let id = movieData[i]['id'];
+                        let id = movieData[i].id;
+                        let title = movieData[i].title;
+                        let poster_path = movieData[i].poster_path;
+                        let overview = movieData[i].overview;
+                        let vote_average = movieData[i].vote_average;
+
+                        // temp_html로 카드 html에 영화 id, 제목, 이미지 등 붙이기
                         let temp_html = `            
             <div id="cardAll" class="card" style="width: 18rem;">
-                <div class="card h-100" onclick="alert('영화 ID는 ${id}입니다.')">
+                <a><div class="card h-100" onclick="alert('영화 ID는 ${id}입니다.')">
                 <div class="card-body">
                     <h5 class="card-title" id="movieTitle">${title}</h5>
                 </div>
@@ -165,24 +170,24 @@
                         </li>
                     </ul>
                     </div>
+                    </a>
             </div>`;
-                        cardList.insertAdjacentHTML('beforeend', temp_html);
+                        cardList.innerHTML += temp_html;
                     }
                 })
                 .catch(err => console.error(err));
         }
-        movieList();
+        movieResult();
+
 
         // 검색 기능 구현! (주석 적고 주석에 따라 코드 작성)
         function searchbtn() {
             // 1. searchInput 값 가져오기 (**카드 제목 연결** getElementById, indexOf)
             const searchInput = document.getElementById('name');
 
-            const filteredMoviedata = movieData.filter((movie) => {
-                if (movie.title.indexOf(searchInput.value) !== -1) { // -1: 검색 돌려서 index가 -1이 아닌 지점에 검색 결과 같은 것 반환
-                    return true;
-                }
-            });
+            const filteredMoviedata = movieData.filter(movie =>
+                movie.title.indexOf(searchInput.value) !== -1  // -1: 검색 돌려서 index가 -1이 아닌 지점에 검색 결과 같은 것 반환
+            );
 
             // 2. cardList에 cards 데이터 넣기 (innerHTML)
             const cardList = document.getElementById('mycards')
@@ -213,10 +218,9 @@
                     </ul>
                     </div>
             </div>`;
-                cardList.insertAdjacentHTML('beforeend', temp_html);
+                cardList.innerHTML += temp_html;
             }
         };
-
 
     </script>
 </head>
@@ -258,7 +262,7 @@
                 <h1 class="display-5 fw-bold" id="maintitle">인기 영화 리스트</h1>
                 <p id="maincontent" class="col-md-8 fs-4"></p>
                 <button class="btn btn-primary" id="savebtn">평점순</button>
-                <button type="button" class="btn btn-danger" id="closebtn">인기순</button>
+                <button type="button" class="btn btn-danger" id="closebtn">최신순</button>
             </div>
         </div>
     </div>
